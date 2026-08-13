@@ -19,5 +19,8 @@ class MyProCamera(Camera):
         # The Android app detects the connection and turns on the lens!
         return self._stream_source
 
-def setup_platform(hass, config, add_entities, discovery_info=None):
-    add_entities([MyProCamera()])
+# Remove setup_platform and replace it with this:
+async def async_setup_entry(hass, entry, async_add_entities):
+    """Set up the camera from a config entry."""
+    ip_address = entry.data["ip_address"]
+    async_add_entities([MyProCamera(ip_address)])
