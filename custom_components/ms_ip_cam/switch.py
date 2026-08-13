@@ -1,52 +1,42 @@
-from homeassistant.components.select import SelectEntity
+from homeassistant.components.switch import SwitchEntity
 import requests
 
-class MSCamLensSelect(SelectEntity):
-    """Lens Switcher Entity."""
+DOMAIN = "ms_ip_cam"
+
+class FlashlightSwitch(SwitchEntity):
     def __init__(self, ip_address: str, http_port: int):
-        self._attr_name = "MS IP Cam Lens Switcher"
-        self._attr_icon = "mdi:camera-flip"
-        self._attr_options = ["Main (Back)", "Ultrawide", "Telephoto", "Front (Selfie)"]
-        self._attr_current_option = "Main (Back)"
+        self._attr_name = "MS IP Cam Flashlight"
+        self._is_on = False
         self._ip = ip_address
         self._port = http_port
 
-    def select_option(self, option: str) -> None:
-        lens_map = {
-            "Main (Back)": "main",
-            "Ultrawide": "ultrawide",
-            "Telephoto": "telephoto",
-            "Front (Selfie)": "front"
-        }
-        lens_param = lens_map.get(option, "main")
+    @property
+    def is_on(self):
+        return self._is_on
+
+    def update(self):
+        """Poll the camera app for status to keep two-way sync in check."""
         try:
-            requests.get(f"http://{self._ip}:{self._port}/lens?type={lens_param}", timeout=3)
-            self._attr_current_option = option
+            res = requests.get(f"http://{self._ip}:{self._port}/status", timeout=2)
+            if res.status_code == 200:
+                self._is_on = res.json().get("flash", False)
         except requests.exceptions.RequestException:
             pass
 
-class MSCamModeSelect(SelectEntity):
-    """Operating Mode Entity."""
-    def __init__(self, ip_address: str, http_port: int):
-        self._attr_name = "MS IP Cam Operating Mode"
-        self._attr_icon = "mdi:cog"
-        self._attr_options = ["On-Demand", "Always On (24/7)"]
-        self._attr_current_option = "On-Demand"
-        self._ip = ip_address
-        self._port = http_port
-
-    def select_option(self, option: str) -> None:
-        mode_param = "always_on" if option == "Always On (24/7)" else "on_demand"
+    def turn_on(self, **kwargs):
         try:
-            requests.get(f"http://{self._ip}:{self._port}/mode?type={mode_param}", timeout=3)
-            self._attr_current_option = option
+            requests.get(f"http://{self._ip}:{self._port}/flash?state=on", timeout=3)
+            self._is_on = True
+        except requests.exceptions.RequestException:
+            pass
+
+    def turn_off(self, **kwargs):
+        try:
+            requests.get(f"http://{self._ip}:{self._port}/flash?state=off", timeout=3)
+            self._is_on = False
         except requests.exceptions.RequestException:
             pass
 
 async def async_setup_entry(hass, entry, async_add_entities):
-    ip_address = entry.data["ip_address"]
-    http_port = entry.data.get("http_port", 8080)
-    async_add_entities([
-        MSCamLensSelect(ip_address, http_port),
-        MSCamModeSelect(ip_address, http_port)
-    ])
+    data = hass.data[DOMAIN][entry.entry_id]
+    async_add_entities([FlashlightSwitch(data["ip_address"], data["http_port"])])
