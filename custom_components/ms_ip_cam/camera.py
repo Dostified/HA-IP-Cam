@@ -23,4 +23,7 @@ class MyProCamera(Camera):
 async def async_setup_entry(hass, entry, async_add_entities):
     """Set up the camera from a config entry."""
     ip_address = entry.data["ip_address"]
-    async_add_entities([MyProCamera(ip_address)])
+    rtsp_port = entry.data["rtsp_port"]
+    
+    # Pass both variables into your camera class
+    async_add_entities([MyProCamera(ip_address, rtsp_port)])
