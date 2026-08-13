@@ -1,6 +1,8 @@
 from homeassistant.components.button import ButtonEntity
 import requests
 
+DOMAIN = "ms_ip_cam"
+
 class CameraShutterButton(ButtonEntity):
     def __init__(self, ip_address: str, http_port: int):
         self._attr_name = "MS IP Cam Shutter Button"
@@ -8,14 +10,12 @@ class CameraShutterButton(ButtonEntity):
         self._ip = ip_address
         self._port = http_port
 
-    def press((self) -> None:
-        """Handle the button press to trigger camera shutter."""
+    def press(self) -> None:
         try:
             requests.get(f"http://{self._ip}:{self._port}/shutter", timeout=3)
         except requests.exceptions.RequestException:
             pass
 
 async def async_setup_entry(hass, entry, async_add_entities):
-    ip_address = entry.data["ip_address"]
-    http_port = entry.data.get("http_port", 8080)
-    async_add_entities([CameraShutterButton(ip_address, http_port)])
+    data = hass.data[DOMAIN][entry.entry_id]
+    async_add_entities([CameraShutterButton(data["ip_address"], data["http_port"])])
