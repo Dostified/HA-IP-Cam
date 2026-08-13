@@ -26,5 +26,8 @@ class MSCamModeSelect(SelectEntity):
         except requests.exceptions.RequestException:
             pass
 
-def setup_platform(hass, config, add_entities, discovery_info=None):
-    add_entities([MSCamModeSelect()])
+# Remove setup_platform and replace it with this:
+async def async_setup_entry(hass, entry, async_add_entities):
+    """Set up the select menu from a config entry."""
+    ip_address = entry.data["ip_address"]
+    async_add_entities([MSCamModeSelect(ip_address)])
