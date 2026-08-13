@@ -1,13 +1,12 @@
 import requests
 from homeassistant.components.select import SelectEntity
 
-ANDROID_IP = "192.168.1.100"  # Replace with your phone's local IP address
-
 class MSCamModeSelect(SelectEntity):
-    def __init__(self):
+    def __init__(self, ip_address: str):
         self._attr_name = "MS IP Cam Operating Mode"
         self._attr_options = ["On-Demand", "Always On (24/7)"]
         self._attr_current_option = "On-Demand"
+        self._ip = ip_address
 
     @property
     def name(self):
@@ -21,12 +20,11 @@ class MSCamModeSelect(SelectEntity):
         """Handle mode changes from Home Assistant UI."""
         mode_param = "always_on" if option == "Always On (24/7)" else "on_demand"
         try:
-            requests.get(f"http://{ANDROID_IP}:8080/mode?type={mode_param}", timeout=3)
+            requests.get(f"http://{self._ip}:8080/mode?type={mode_param}", timeout=3)
             self._attr_current_option = option
         except requests.exceptions.RequestException:
             pass
 
-# Remove setup_platform and replace it with this:
 async def async_setup_entry(hass, entry, async_add_entities):
     """Set up the select menu from a config entry."""
     ip_address = entry.data["ip_address"]
