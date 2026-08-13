@@ -1,0 +1,11 @@
+{
+  "domain": "ha_ip_camera",
+  "name": "Home Assistant IP Camera",
+  "documentation": "https://github.com/Dostified/MS-IP-Cam",
+  "issue_tracker": "https://github.com/Dostified/MS-IP-Cam/issues",
+  "codeowners": ["@Dostified"],
+  "dependencies": ["stream"],
+  "iot_class": "local_polling",
+  "config_flow": true,
+  "version": "2.0.0"
+}
