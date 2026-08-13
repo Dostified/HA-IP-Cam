@@ -8,14 +8,13 @@ class MSIPCamConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
 
     async def async_step_user(self, user_input=None):
-        """Handle the initial step."""
         if user_input is not None:
-            # Save the IP address the user typed in!
             return self.async_create_entry(title="MS IP Cam", data=user_input)
 
-        # Show the form to the user
+        # We now ask for both the IP Address and the RTSP Port
         data_schema = vol.Schema({
             vol.Required("ip_address", default="192.168.1.100"): str,
+            vol.Required("rtsp_port", default=8554): int,
         })
 
         return self.async_show_form(
