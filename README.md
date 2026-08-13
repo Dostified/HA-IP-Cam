@@ -1,6 +1,6 @@
-# MS IP Cam for Home Assistant
+# HA IP Cam for Home Assistant
 
-This is a custom integration that connects Home Assistant to the MS IP Cam Android app. It provides a true on-demand RTSP feed, flashlight toggles, and lens controls directly from your Home Assistant dashboard.
+This is a custom integration that connects Home Assistant to the HA IP Cam Android app. It provides a true on-demand RTSP feed, flashlight toggles, and lens controls directly from your Home Assistant dashboard.
 
 ## Installation via HACS
 
