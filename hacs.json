@@ -1,5 +1,5 @@
 {
-  "name": "MS IP Cam",
+  "name": "HA IP Cam",
   "render_readme": true,
   "homeassistant": "2023.8.0"
 }
